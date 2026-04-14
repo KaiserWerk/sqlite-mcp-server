@@ -265,7 +265,6 @@ func (s *SQLiteDB) Close() error {
 	return nil
 }
 
-// Helper functions
 func isSelectQuery(query string) bool {
 	trimmed := strings.TrimSpace(strings.ToUpper(query))
 	return strings.HasPrefix(trimmed, "SELECT") ||
@@ -273,8 +272,6 @@ func isSelectQuery(query string) bool {
 		strings.HasPrefix(trimmed, "EXPLAIN")
 }
 
-// TODO: To be improved with more complex sanitization logic
-// sanitizeQuery sanitizes the SQL query string
 func sanitizeQuery(query string) string {
 	if len(query) > 100 {
 		return query[:97] + "..."
