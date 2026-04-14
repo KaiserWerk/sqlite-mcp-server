@@ -79,7 +79,7 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	)
 
 	// Get Schema Tool - No parameters needed
-	listTablesTool := mcp.NewTool("get_schema",
+	listTablesTool := mcp.NewTool("sqlite_get_schema",
 		mcp.WithDescription("List all tables in the SQLite database with their schema information including columns, types, constraints, and indexes"),
 		mcp.WithReadOnlyHintAnnotation(true),
 		mcp.WithDestructiveHintAnnotation(false),
@@ -88,7 +88,7 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	mcpServer.AddTool(listTablesTool, mcpHandler.GetSchema)
 
 	// Query Database Tool
-	queryDatabaseTool := mcp.NewTool("query",
+	queryDatabaseTool := mcp.NewTool("sqlite_query",
 		mcp.WithDescription("Execute SELECT queries against the SQLite database. Only SELECT, WITH, and EXPLAIN queries are allowed."),
 		mcp.WithString("sql",
 			mcp.Required(),
@@ -103,8 +103,8 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	mcpServer.AddTool(queryDatabaseTool, mcpHandler.Query)
 
 	// Execute Database Tool
-	executeDatabaseTool := mcp.NewTool("execute",
-		mcp.WithDescription("Execute DDL/DML operations (INSERT, UPDATE) against the SQLite database. SELECT queries are not allowed - use queryDatabase instead."),
+	executeDatabaseTool := mcp.NewTool("sqlite_execute",
+		mcp.WithDescription("Execute DDL/DML operations (INSERT, UPDATE) against the SQLite database. SELECT queries are not allowed - use sqlite_query instead."),
 		mcp.WithString("sql",
 			mcp.Required(),
 			mcp.Description("SQL statement to execute (non-SELECT operations only)"),
@@ -118,8 +118,8 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	mcpServer.AddTool(executeDatabaseTool, mcpHandler.Execute)
 
 	// Execute administrative tool
-	executeAdminDatabaseTool := mcp.NewTool("execute_admin",
-		mcp.WithDescription("Execute DDL/DML operations (DELETE, CREATE, ALTER, DROP, etc.) against the SQLite database. SELECT queries are not allowed - use queryDatabase instead."),
+	executeAdminDatabaseTool := mcp.NewTool("sqlite_execute_admin",
+		mcp.WithDescription("Execute DDL/DML operations (DELETE, CREATE, ALTER, DROP, etc.) against the SQLite database. SELECT queries are not allowed - use sqlite_query instead."),
 		mcp.WithString("sql",
 			mcp.Required(),
 			mcp.Description("SQL statement to execute (non-SELECT operations only) administrative or destructive operations that may modify or delete data, alter schema, or perform other high-impact actions"),
