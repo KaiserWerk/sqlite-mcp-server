@@ -12,6 +12,7 @@ import (
 	"github.com/KaiserWerk/sqlite-mcp-server/internal/config"
 	"github.com/KaiserWerk/sqlite-mcp-server/internal/handlers"
 	"github.com/KaiserWerk/sqlite-mcp-server/internal/repository"
+
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

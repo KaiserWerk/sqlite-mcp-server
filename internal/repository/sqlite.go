@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/KaiserWerk/sqlite-mcp-server/internal/models"
-	_ "github.com/mattn/go-sqlite3"
+
+	_ "modernc.org/sqlite"
 )
 
 var _ Repository = (*SQLiteDB)(nil)
@@ -19,7 +20,7 @@ type SQLiteDB struct {
 
 func NewSQLiteDB(dbPath string, logger *slog.Logger) (*SQLiteDB, error) {
 	// Open SQLite database directly
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
@@ -34,7 +35,7 @@ func NewSQLiteDB(dbPath string, logger *slog.Logger) (*SQLiteDB, error) {
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 
-	logger.Info("Connected to SQLite database: ", dbPath)
+	logger.Info("Connected to SQLite database: " + dbPath)
 
 	return &SQLiteDB{
 		db:     db,
