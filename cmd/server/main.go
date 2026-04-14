@@ -46,7 +46,7 @@ func main() {
 
 	err := runServer(context.Background(), cfg, logger)
 	if err != nil {
-		logger.Error("Server error: %v", err)
+		logger.Error("Server error: " + err.Error())
 		os.Exit(1)
 	}
 }
@@ -55,7 +55,7 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	// Initialize database
 	repo, err := repository.NewSQLiteDB(cfg.DatabasePath, logger)
 	if err != nil {
-		logger.Error("Failed to initialize database: %v", err)
+		logger.Error("Failed to initialize database: " + err.Error())
 		return err
 	}
 	defer repo.Close()
@@ -140,7 +140,7 @@ func runServer(ctx context.Context, cfg *config.Config, logger *slog.Logger) err
 	// TODO: Look into alternatives for transport layer (sse, streamable-http)
 	logger.Info("SQLite MCP Server started successfully")
 	if err := server.ServeStdio(mcpServer); err != nil {
-		logger.Error("Server error: %v", err)
+		logger.Error("Server error: " + err.Error())
 	}
 
 	logger.Info("SQLite MCP Server stopped")
