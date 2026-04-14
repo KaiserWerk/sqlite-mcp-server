@@ -41,11 +41,20 @@ func main() {
 	if cfg.Debug {
 		level = slog.LevelDebug
 	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+
+	fh, err := os.Create("server.log")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating log file: %v\n", err)
+		os.Exit(1)
+	}
+	defer fh.Close()
+
+	logger := slog.New(slog.NewTextHandler(fh, &slog.HandlerOptions{
 		Level: level,
 	}))
 
-	err := runServer(context.Background(), cfg, logger)
+	err = runServer(context.Background(), cfg, logger)
+	_ = fh.Close()
 	if err != nil {
 		logger.Error("Server error: " + err.Error())
 		os.Exit(1)
