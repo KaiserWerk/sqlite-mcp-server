@@ -459,9 +459,9 @@ func TestMCPHandler_Execute_DDL(t *testing.T) {
 		},
 	}
 
-	result, err := handler.Execute(ctx, request)
+	result, err := handler.ExecuteAdmin(ctx, request)
 	if err != nil {
-		t.Fatalf("Execute failed: %v", err)
+		t.Fatalf("ExecuteAdmin failed: %v", err)
 	}
 
 	if result.IsError {

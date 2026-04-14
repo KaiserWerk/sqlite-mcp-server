@@ -35,7 +35,7 @@ func NewSQLiteDB(dbPath string, logger *slog.Logger) (*SQLiteDB, error) {
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 
-	logger.Info("Connected to SQLite database: " + dbPath)
+	logger.Info("Connected to SQLite database", "db_path", dbPath)
 
 	return &SQLiteDB{
 		db:     db,
@@ -50,7 +50,7 @@ func (s *SQLiteDB) GetSchema() ([]models.Table, error) {
 
 	rows, err := s.db.Query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
 	if err != nil {
-		s.logger.Error("Failed to retrieve table names: ", err)
+		s.logger.Error("Failed to retrieve table names", "error", err)
 		return nil, fmt.Errorf("failed to retrieve table information")
 	}
 	defer rows.Close()
@@ -59,7 +59,7 @@ func (s *SQLiteDB) GetSchema() ([]models.Table, error) {
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
-			s.logger.Error("Failed to scan table name: ", err)
+			s.logger.Error("Failed to scan table name", "error", err)
 			continue
 		}
 		tableNames = append(tableNames, tableName)
@@ -67,7 +67,7 @@ func (s *SQLiteDB) GetSchema() ([]models.Table, error) {
 
 	// Check for errors during iteration
 	if err := rows.Err(); err != nil {
-		s.logger.Error("Error during table name iteration: ", err)
+		s.logger.Error("Error during table name iteration", "error", err)
 		return nil, fmt.Errorf("failed to retrieve table information")
 	}
 
@@ -76,13 +76,13 @@ func (s *SQLiteDB) GetSchema() ([]models.Table, error) {
 	for _, tableName := range tableNames {
 		tableInfo, err := s.getTableInfo(tableName)
 		if err != nil {
-			s.logger.Error("Failed to get table info for table ", tableName, ": ", err)
+			s.logger.Error("Failed to get table info", "table_name", tableName, "error", err)
 			continue
 		}
 		tables = append(tables, *tableInfo)
 	}
 
-	s.logger.Info("Successfully retrieved table information, table_count: ", len(tables))
+	s.logger.Info("Successfully retrieved table information", "table_count", len(tables))
 	return tables, nil
 }
 
@@ -184,7 +184,7 @@ func (s *SQLiteDB) getTableInfo(tableName string) (*models.Table, error) {
 }
 
 func (s *SQLiteDB) Query(sqlQuery string) (*models.QueryResult, error) {
-	s.logger.Debug("Executing query: ", sanitizeQuery(sqlQuery))
+	s.logger.Debug("Executing query", "sql", sanitizeQuery(sqlQuery))
 
 	if !isSelectQuery(sqlQuery) {
 		return nil, fmt.Errorf("only SELECT queries are allowed for query operations")
@@ -192,7 +192,7 @@ func (s *SQLiteDB) Query(sqlQuery string) (*models.QueryResult, error) {
 
 	rows, err := s.db.Query(sqlQuery)
 	if err != nil {
-		s.logger.Error("Query execution failed: ", err)
+		s.logger.Error("Query execution failed", "error", err)
 		return nil, fmt.Errorf("query execution failed")
 	}
 	defer rows.Close()
@@ -228,12 +228,12 @@ func (s *SQLiteDB) Query(sqlQuery string) (*models.QueryResult, error) {
 		Count:   len(results),
 	}
 
-	s.logger.Info("Query executed successfully, rows_returned: ", len(results))
+	s.logger.Info("Query executed successfully", "rows_returned", len(results))
 	return result, nil
 }
 
 func (s *SQLiteDB) Execute(sqlQuery string) (*models.ExecuteResult, error) {
-	s.logger.Debug("Executing statement: ", sanitizeQuery(sqlQuery))
+	s.logger.Debug("Executing statement", "sql", sanitizeQuery(sqlQuery))
 
 	if isSelectQuery(sqlQuery) {
 		return nil, fmt.Errorf("SELECT queries should use the query operation instead")
@@ -241,7 +241,7 @@ func (s *SQLiteDB) Execute(sqlQuery string) (*models.ExecuteResult, error) {
 
 	result, err := s.db.Exec(sqlQuery)
 	if err != nil {
-		s.logger.Error("Statement execution failed: ", err)
+		s.logger.Error("Statement execution failed", "error", err)
 		return nil, fmt.Errorf("statement execution failed")
 	}
 
@@ -254,7 +254,7 @@ func (s *SQLiteDB) Execute(sqlQuery string) (*models.ExecuteResult, error) {
 		Message:      fmt.Sprintf("Statement executed successfully, %d rows affected", rowsAffected),
 	}
 
-	s.logger.Info("Statement executed successfully, rows_affected: ", rowsAffected, ", last_insert_id: ", lastInsertId)
+	s.logger.Info("Statement executed successfully", "rows_affected", rowsAffected, "last_insert_id", lastInsertId)
 
 	return executeResult, nil
 }
