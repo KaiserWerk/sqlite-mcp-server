@@ -1,2 +1,5 @@
 **/*.log
 **/*.exe
+
+/build/*
+!/build/build.ps1
